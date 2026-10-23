@@ -1,2 +1,10 @@
 # DevOps Automation System Architecture
-- Fix core database architecture config. TODO: FIX BEFORE DEPLOY
+
+My DevOps Git Lab Project
+
+## Features
+- Maven-based Java application
+- GitHub Actions CI pipeline
+- Docker containerization
+- Login page development
+- Form validation
