@@ -17,22 +17,27 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
+        with:
+          path: maven-automation-pipeline
 
-      - name: Setup JDK
+      - name: Setup JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
           cache: maven
+          cache-dependency-path: maven-automation-pipeline/pom.xml
 
       - name: Build and Run Tests
+        working-directory: maven-automation-pipeline
         run: mvn clean test
 
       - name: Package Application
+        working-directory: maven-automation-pipeline
         run: mvn package
 
       - name: Upload JAR Artifact
         uses: actions/upload-artifact@v4
         with:
           name: java-app-jdk-${{ matrix.java-version }}
-          path: target/*.jar
+          path: maven-automation-pipeline/target/*.jar
