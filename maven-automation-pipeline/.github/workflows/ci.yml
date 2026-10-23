@@ -18,12 +18,21 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Setup JDK ${{ matrix.java-version }}
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          cache: maven
 
-      - name: Run Automated Test Suites
-        run: mvn test
+      - name: Build and Run Tests
+        run: mvn clean test
+
+      - name: Package Application
+        run: mvn package
+
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-app-jdk-${{ matrix.java-version }}
+          path: target/*.jar
