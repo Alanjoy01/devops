@@ -56,4 +56,3 @@ jobs:
           echo "Staging approval completed."
           echo "Checking downloaded Java application artifact..."
           ls -lh staging-artifact/
-```
