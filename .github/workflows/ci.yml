@@ -1,0 +1,86 @@
+name: DevOps Java CI Automation Pipeline
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: [17, 21]
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+
+      - name: Build and Run Tests
+        run: mvn -f maven-automation-pipeline/pom.xml clean test
+
+      - name: Package Application
+        run: mvn -f maven-automation-pipeline/pom.xml package
+
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-app-jdk-${{ matrix.java-version }}
+          path: maven-automation-pipeline/target/*.jar
+
+  staging-deployment:
+    name: Automatic Staging Deployment
+    runs-on: ubuntu-latest
+    needs: build-and-validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    environment:
+      name: staging
+
+    steps:
+      - name: Download Java Application Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: java-app-jdk-17
+          path: staging-artifact
+
+      - name: Verify Staging Artifact
+        run: |
+          echo "Automatic staging workflow started."
+          echo "Checking downloaded Java application artifact..."
+          ls -lh staging-artifact/
+
+      - name: Deployment Confirmation
+        run: echo "Staging artifact verification completed successfully."
+
+        production-deployment:
+name: Automatic Production Deployment
+runs-on: ubuntu-latest
+needs: build-and-validate
+if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+
+steps:
+  - name: Download Java Application Artifact
+    uses: actions/download-artifact@v4
+    with:
+      name: java-app-jdk-17
+      path: production-artifact
+
+  - name: Verify Production Artifact
+    run: |
+      echo "Automatic production deployment started."
+      echo "Checking downloaded Java application artifact..."
+      ls -lh production-artifact/
+
+  - name: Deployment Confirmation
+    run: echo "Production artifact verification completed successfully."
+

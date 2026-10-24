@@ -1,0 +1,1 @@
+Testing the Maven pre-commit hook

@@ -1,0 +1,27 @@
+name: DevOps Continuous Deployment Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["master"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and Test Application
+        run: mvn -f maven-automation-pipeline/pom.xml clean package
+
+      - name: Deploy Application
+        run: docker compose -f maven-automation-pipeline/docker-compose.yml up -d --force-recreate
